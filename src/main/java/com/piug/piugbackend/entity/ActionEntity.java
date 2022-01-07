@@ -1,13 +1,14 @@
 package com.piug.piugbackend.entity;
 
-import com.piug.piugbackend.common.AnimalStatus;
-import com.piug.piugbackend.common.AnimalType;
+import com.piug.piugbackend.common.ActionType;
 import lombok.*;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
-import java.util.List;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -15,36 +16,30 @@ import java.util.Objects;
 @Setter
 @ToString
 @RequiredArgsConstructor
-@Table(
-        uniqueConstraints = @UniqueConstraint(columnNames = "name")
-)
-public class AnimalEntity {
+public class ActionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "id", nullable = false)
     private Long id;
 
-    private String name;
-
-    @Enumerated(EnumType.STRING)
-    private AnimalType animalType;
-
-    private int age;
+    @CreationTimestamp
+    private Instant date;
 
     private String description;
 
     @Enumerated(EnumType.STRING)
-    private AnimalStatus status = AnimalStatus.IN_CUSTODY;
+    private ActionType actionType;
 
-    @OneToMany(mappedBy = "animalEntity")
-    @ToString.Exclude
-    private List<ActionEntity> actionEntity;
+    @ManyToOne
+    @JoinColumn(name="animal_id")
+    private AnimalEntity animalEntity;
+
+    private String issuerEmail;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        AnimalEntity that = (AnimalEntity) o;
+        ActionEntity that = (ActionEntity) o;
         return id != null && Objects.equals(id, that.id);
     }
 
